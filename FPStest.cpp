@@ -16,14 +16,17 @@ void my_input_callback(GLFWwindow* window, int key,int scancode,int action,int m
     glfwSetWindowShouldClose(window,true);
   }
 }
-int main()
+int main(int argc,char** argv)
 {
+  if(argc < 2) return 1;
+  int width = atoi(*++argv);
+  int height = atoi(*++argv);
   if(!glfwInit()){
     fprintf(stdout,"Error\n");
     glfwTerminate();
     return 1;
   }
-  GLFWwindow* window = glfwCreateWindow(800,800,"MM",NULL,NULL);
+  GLFWwindow* window = glfwCreateWindow(width,height,"MM",NULL,NULL);
   glfwMakeContextCurrent(window);
   glfwSetKeyCallback(window,my_input_callback);
   if(GLEW_OK != glewInit()){
@@ -40,19 +43,20 @@ int main()
   GLfloat t1 = glfwGetTime();
   GLfloat t2;
   GLfloat diff;
+  GLfloat frameRate;
   int frames(0);
   while(!glfwWindowShouldClose(window)){
     glClear(GL_COLOR_BUFFER_BIT);
     glClearColor(0.0f,0.4f,0.0f,1.0f);
     glfwPollEvents();
     t2 = glfwGetTime();
-    diff += t2-t1;
+    diff = t2-t1;
     frames++;
-    if(diff >= 1.0f){
-      glfwSetWindowTitle(window,std::to_string(frames).c_str());
-      frames = 0;
+    if(diff > 0.25){
+      frameRate = frames/diff;      
+      glfwSetWindowTitle(window,std::to_string(frameRate).c_str());
       t1 = t2;
-      diff = 0;
+      frames = 0;
     }
     glfwSwapBuffers(window);
   }
